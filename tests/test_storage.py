@@ -124,7 +124,7 @@ def test_factory_real(monkeypatch):
     assert isinstance(get_storage(), SheetsStorage)
 
 
-def test_sheets_storage_calls_append_row_user_entered(monkeypatch):
+def test_sheets_storage_calls_append_row_raw(monkeypatch):
     monkeypatch.setenv("DRY_RUN", "false")
     monkeypatch.setenv("GOOGLE_SHEETS_ID", "test-id")
     get_settings.cache_clear()
@@ -146,7 +146,7 @@ def test_sheets_storage_calls_append_row_user_entered(monkeypatch):
     call_args = fake_ws.append_row.call_args
     values = call_args.args[0]
     assert len(values) == len(COLUMNS)
-    assert call_args.kwargs["value_input_option"] == "USER_ENTERED"
+    assert call_args.kwargs["value_input_option"] == "RAW"
 
 
 def test_sheets_storage_caches_worksheet(monkeypatch):

@@ -96,7 +96,7 @@ class SheetsStorage:
 
     def append(self, row: dict) -> None:
         ws = self._get_worksheet()
-        ws.append_row(_row_to_values(row), value_input_option="USER_ENTERED")
+        ws.append_row(_row_to_values(row), value_input_option="RAW")
         log.info("storage.append(sheets) lead_id=%s", row.get("lead_id"))
 
 

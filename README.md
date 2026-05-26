@@ -30,7 +30,7 @@ POST /lead  ──>  Pydantic validate  ──>  202 ACCEPTED + lead_id (uuid4)
 1. **Intake** — Pydantic `LeadIn` (`extra='forbid'`, `str_strip_whitespace`), POST `/lead` → 202 + uuid4, BackgroundTask
 2. **Normalization** — phonenumbers E.164 (`region=UA`), email-validator `.normalized`, sha256 dedup-ключ
 3. **AI classify** — `client.messages.parse(output_format=LeadClassification)`, score clamp 0-100, max_tokens retry
-4. **Storage** — `COLUMNS` як єдине джерело правди, gspread service account, `append_row(USER_ENTERED)`
+4. **Storage** — `COLUMNS` як єдине джерело правди, gspread service account, `append_row(RAW)` (зберігає `+` у E.164-телефоні без формульної інтерпретації)
 5. **Notify** — httpx Telegram, HTML escape, junk-маркер, error swallow
 6. **E2E + this README**
 

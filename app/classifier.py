@@ -38,7 +38,9 @@ TODO (Mesiaf): fill in scoring criteria here — urgency signals, stated budget,
 fit with our services, contact-quality hints, etc.
 
 If the message is empty or low-signal, return a low score with reason "low signal".
-Stay neutral and concise."""
+Stay neutral and concise.
+
+Reply in Ukrainian — the team reviewing the leads works in Ukrainian."""
 
 
 def _derive_class(score: int) -> str:
