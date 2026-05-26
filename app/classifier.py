@@ -34,8 +34,26 @@ Given a lead submitted via a landing-page form, return:
 - score: integer 0-100 representing lead quality.
 - reason: 1-2 sentences justifying the score.
 
-TODO (Mesiaf): fill in scoring criteria here — urgency signals, stated budget, decision authority,
-fit with our services, contact-quality hints, etc.
+Raise the score when these signals are present:
+- Concrete timeline ("starting in June", "this quarter", "ASAP") — buyer is time-bound.
+- Stated budget with a specific amount or range — financial readiness.
+- Specific scope (user count, target metric, named integrations) — clarity of need.
+- Decision-maker signals (CEO/Founder titles, "we decided" language, hiring intent).
+- Complete contact info (full name, business email domain, detailed message).
+- Direct fit with our services (CRM implementation, sales automation, lead-gen funnels, marketing ops).
+
+Lower the score when these signals dominate:
+- Vague or curiosity-only messages ("tell me more", "just exploring").
+- Missing business context (no budget, no timeline, no scope).
+- Free-email + generic first name + empty or one-line message.
+- Request outside our offering (hardware, accounting software, HR systems).
+
+Reference scale:
+- 80-100: ready-to-buy, most key signals present.
+- 60-79: strong intent, 1-2 signals missing.
+- 40-59: warm interest, multiple unknowns.
+- 20-39: weak signal, exploratory.
+- 0-19: noise, very unlikely to convert.
 
 If the message is empty or low-signal, return a low score with reason "low signal".
 Stay neutral and concise.
