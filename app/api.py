@@ -7,6 +7,7 @@ from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel, ConfigDict, Field
 
 from .config import get_settings
+from .normalizer import normalize
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,8 +37,23 @@ def health() -> dict[str, str | bool]:
 def _process_lead(lead_id: str, payload: dict) -> None:
     """Background pipeline. Wired up across Stages 2-5."""
     log.info("lead.received id=%s name=%s", lead_id, payload.get("name"))
-    # Stage 2: normalize(...)
-    # Stage 3: classify(...)
+    n = normalize(
+        name=payload["name"],
+        phone=payload["phone"],
+        email=payload["email"],
+        message=payload.get("message"),
+        source=payload.get("source"),
+    )
+    log.info(
+        "lead.normalized id=%s valid=%s duplicate=%s phone=%s email=%s issues=%s",
+        lead_id,
+        n.is_valid,
+        n.is_duplicate,
+        n.phone_e164,
+        n.email_normalized,
+        n.issues,
+    )
+    # Stage 3: classify(n)
     # Stage 4: storage.append(...)
     # Stage 5: notifier.notify(...)
 
