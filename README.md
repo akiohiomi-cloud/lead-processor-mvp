@@ -7,7 +7,9 @@ MVP backend для обробки заявок з лендінг-форми. POS
 ## Архітектура
 
 ```
-POST /lead  ──>  Pydantic validate  ──>  202 ACCEPTED + lead_id (uuid4)
+GET  /       ──>  demo landing-форма (FileResponse, app/static/index.html)
+GET  /health ──>  {"status":"ok","dry_run":bool}
+POST /lead   ──>  Pydantic validate  ──>  202 ACCEPTED + lead_id (uuid4)
                                               │
                                               ▼ BackgroundTask
                           1. normalize()    phone→E.164 (UA region), email→.normalized, sha256 dedup
@@ -24,7 +26,7 @@ POST /lead  ──>  Pydantic validate  ──>  202 ACCEPTED + lead_id (uuid4)
 
 Кожен зовнішній виклик обгорнутий try/except — падіння Sheets/Telegram/Anthropic не валить флоу. /lead все одно повертає 202.
 
-## 6 етапів (відповідають git-комітам)
+## 7 етапів (відповідають git-комітам)
 
 0. **Skeleton** — `app/{api,config,normalizer,classifier,storage,notifier}.py`, factory-функції за `DRY_RUN`
 1. **Intake** — Pydantic `LeadIn` (`extra='forbid'`, `str_strip_whitespace`), POST `/lead` → 202 + uuid4, BackgroundTask
@@ -33,6 +35,7 @@ POST /lead  ──>  Pydantic validate  ──>  202 ACCEPTED + lead_id (uuid4)
 4. **Storage** — `COLUMNS` як єдине джерело правди, gspread service account, `append_row(RAW)` (зберігає `+` у E.164-телефоні без формульної інтерпретації)
 5. **Notify** — httpx Telegram, HTML escape, junk-маркер, error swallow
 6. **E2E + this README**
+7. **Landing** — статична форма заявки на `GET /` (vanilla HTML/CSS/JS, без CDN/збірок), `app/static/index.html`, шле POST на `/lead`
 
 ## Quickstart (DRY_RUN — БЕЗ ключів)
 
@@ -46,11 +49,13 @@ python -m venv .venv
 # source .venv/bin/activate
 
 pip install -r requirements.txt
-pytest -v        # ~67 тестів, всі external services замоковано
-uvicorn app.api:app --port 8000
+pytest -v        # 67 тестів, всі external services замоковано
+DRY_RUN=1 uvicorn app.api:app --port 8000
 ```
 
-В іншому терміналі:
+Відкрий **http://127.0.0.1:8000/** — побачиш landing-форму. Заповни, натисни «Залишити заявку» → success-стан + рядок у `logs/leads.jsonl` + рендерене Telegram-повідомлення в server-логах.
+
+Або curl напряму:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/lead \
