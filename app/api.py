@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 import uuid
+from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from .classifier import classify
@@ -11,6 +13,8 @@ from .config import get_settings
 from .normalizer import normalize
 from .notifier import get_notifier, render_message
 from .storage import build_row, get_storage
+
+_STATIC_DIR = Path(__file__).parent / "static"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,6 +33,14 @@ class LeadIn(BaseModel):
     email: str = Field(min_length=3, max_length=200)
     message: str | None = Field(default=None, max_length=5000)
     source: str | None = Field(default=None, max_length=200)
+
+
+@app.get("/", include_in_schema=False)
+def index() -> FileResponse:
+    return FileResponse(
+        _STATIC_DIR / "index.html",
+        media_type="text/html; charset=utf-8",
+    )
 
 
 @app.get("/health")
