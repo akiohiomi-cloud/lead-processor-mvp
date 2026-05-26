@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .classifier import classify
 from .config import get_settings
 from .normalizer import normalize
+from .notifier import get_notifier, render_message
 from .storage import build_row, get_storage
 
 logging.basicConfig(
@@ -70,7 +71,12 @@ def _process_lead(lead_id: str, payload: dict) -> None:
         log.info("lead.stored id=%s", lead_id)
     except Exception as e:
         log.warning("storage.error id=%s %s: %s", lead_id, type(e).__name__, e)
-    # Stage 5: notifier.notify(...)
+
+    message = render_message(lead_id, n, c)
+    try:
+        get_notifier().notify(message)
+    except Exception as e:
+        log.warning("notifier.error id=%s %s: %s", lead_id, type(e).__name__, e)
 
 
 @app.post("/lead", status_code=202)
