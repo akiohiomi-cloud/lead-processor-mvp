@@ -1,0 +1,15 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+env/
+logs/
+.DS_Store
+service-account*.json
+credentials.json
+.idea/
+.vscode/
