@@ -13,3 +13,4 @@ service-account*.json
 credentials.json
 .idea/
 .vscode/
+CLAUDE.md
