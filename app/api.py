@@ -6,6 +6,7 @@ import uuid
 from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel, ConfigDict, Field
 
+from .classifier import classify
 from .config import get_settings
 from .normalizer import normalize
 
@@ -53,7 +54,14 @@ def _process_lead(lead_id: str, payload: dict) -> None:
         n.email_normalized,
         n.issues,
     )
-    # Stage 3: classify(n)
+    c = classify(n)
+    log.info(
+        "lead.classified id=%s class=%s score=%d reason=%s",
+        lead_id,
+        c.lead_class,
+        c.score,
+        c.reason,
+    )
     # Stage 4: storage.append(...)
     # Stage 5: notifier.notify(...)
 
