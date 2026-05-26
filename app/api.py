@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .classifier import classify
 from .config import get_settings
 from .normalizer import normalize
+from .storage import build_row, get_storage
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,7 +63,13 @@ def _process_lead(lead_id: str, payload: dict) -> None:
         c.score,
         c.reason,
     )
-    # Stage 4: storage.append(...)
+
+    row = build_row(lead_id, n, c)
+    try:
+        get_storage().append(row)
+        log.info("lead.stored id=%s", lead_id)
+    except Exception as e:
+        log.warning("storage.error id=%s %s: %s", lead_id, type(e).__name__, e)
     # Stage 5: notifier.notify(...)
 
 
